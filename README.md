@@ -20,9 +20,11 @@ REST API backend modern yang dibangun menggunakan **Bun**, **ElysiaJS**, **Drizz
 ├── src/
 │   ├── db/
 │   │   ├── index.ts      # Koneksi database MySQL dengan Drizzle ORM
-│   │   └── schema.ts     # Definisi schema database (contoh: users table)
+│   │   └── schema.ts     # Definisi schema database (tabel users dengan password hash)
 │   ├── routes/
-│   │   └── users.ts      # Route CRUD endpoint users
+│   │   └── users-route.ts # Route endpoint /api/users
+│   ├── services/
+│   │   └── user-service.ts# Logic bisnis (registrasi user & hashing password)
 │   └── index.ts          # Entry point aplikasi Elysia (CORS, Swagger, routes)
 ├── .env                  # Environment variables lokal
 ├── .env.example          # Template konfigurasi environment variables
@@ -110,18 +112,33 @@ Dokumentasi interaktif OpenAPI / Swagger dapat diakses di:
 |---|---|---|
 | `GET` | `/` | Health check & info API |
 | `GET` | `/swagger` | Swagger UI documentation |
-| `GET` | `/users` | Mengambil seluruh data user |
-| `GET` | `/users/:id` | Mengambil detail user berdasarkan ID |
-| `POST` | `/users` | Menambahkan user baru |
-| `PUT` | `/users/:id` | Memperbarui data user |
-| `DELETE` | `/users/:id` | Menghapus user berdasarkan ID |
+| `POST` | `/api/users` | Registrasi user baru (password di-hash dengan bcrypt) |
+| `GET` | `/api/users` | Mengambil seluruh data user |
+| `GET` | `/api/users/:id` | Mengambil detail user berdasarkan ID |
+| `DELETE` | `/api/users/:id` | Menghapus user berdasarkan ID |
 
-### Contoh Request Body (`POST /users`)
+### Contoh Request Registrasi User (`POST /api/users`)
 
+**Request Body:**
 ```json
 {
-  "name": "John Doe",
-  "email": "johndoe@example.com"
+  "name": "Roni",
+  "email": "roni@localhost",
+  "password": "rahasia"
+}
+```
+
+**Response Sukses (HTTP 201):**
+```json
+{
+  "data": "OK"
+}
+```
+
+**Response Error (Email duplikat - HTTP 400):**
+```json
+{
+  "error": "Email sudah terdaftar"
 }
 ```
 
